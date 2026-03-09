@@ -21,6 +21,8 @@ class GhidraWrapper:
         """
         初始化项目并导入 body.bin，指定特定的架构和基址
         """
+        # Ghidra Headless 要求项目目录必须事先存在
+        os.makedirs(self.project_dir, exist_ok=True)
         cmd = [
             self.headless_bat,
             self.project_dir,

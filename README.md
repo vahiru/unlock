@@ -42,13 +42,28 @@ uv pip install -r requirements.txt
    GHIDRA_HOME=/opt/ghidra
    ```
 
-### 3. 配置 Ghidra
-确保你在 `.env` 中正确填写了 `GHIDRA_HOME`。对于 Linux 用户：
-1. 下载 Ghidra 的 zip 压缩包并解压：`sudo unzip ghidra_11.x...zip -d /opt/`
-2. 重命名方便管理：`sudo mv /opt/ghidra_11.x_PUBLIC /opt/ghidra`
+### 3. 配置 Ghidra (Linux 示例)
+在 Debian/Ubuntu 上，Ghidra 12.x 需要 **JDK 17 或 21**。
+1. **安装 JDK**:
+   ```bash
+   sudo apt update
+   sudo apt install openjdk-17-jdk
+   ```
+2. **解压 Ghidra**: 
+   假设你的压缩包名为 `ghidra_12.0.4_PUBLIC_20260303.zip`：
+   ```bash
+   sudo unzip ghidra_12.0.4_PUBLIC_20260303.zip -d /opt/
+   # 创建软链接方便引用
+   sudo ln -s /opt/ghidra_12.0.4_PUBLIC /opt/ghidra
+   ```
+3. **验证**: 确保 `/opt/ghidra/support/analyzeHeadless` 文件存在并具有执行权限。
 
 ### 4. 准备目标固件
-将你要分析的固件 `body.bin` (SD865 ABL 镜像) 放置到与代码统计的目录下。如名称不同，请在 `.env` 中修改 `BINARY_PATH` 变量。
+将 `body.bin` 放置在项目目录下（你已经完成了这一步）。然后在 `.env` 中确认路径：
+```dotenv
+BINARY_PATH=body.bin
+GHIDRA_HOME=/opt/ghidra
+```
 
 ### 5. 运行 Agent
 首次运行时，需要取消 `main.py` 中 `decompiler.import_binary(...)` 的注释以完成 Ghidra 初始化。

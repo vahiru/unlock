@@ -12,9 +12,10 @@ class GhidraWrapper:
         self.project_dir = project_dir
         self.project_name = project_name
         self.script_dir = script_dir
-        self.headless_bat = os.path.join(ghidra_home, "support", "analyzeHeadless.bat")
-        if not os.path.exists(self.headless_bat):
-            self.headless_bat = os.path.join(ghidra_home, "support", "analyzeHeadless") # Linux/Mac 兼容
+        if os.name == 'nt':
+            self.headless_bat = os.path.join(ghidra_home, "support", "analyzeHeadless.bat")
+        else:
+            self.headless_bat = os.path.join(ghidra_home, "support", "analyzeHeadless")
 
     def import_binary(self, binary_path: str, base_addr: str = "0x9FA00000"):
         """
@@ -31,7 +32,7 @@ class GhidraWrapper:
             "-overwrite" 
         ]
         print(f"[*] 执行导入并分析: {' '.join(cmd)}")
-        # subprocess.run(cmd, check=True)
+        subprocess.run(cmd, check=True)
         print("[+] Ghidra 导入分析完成。")
 
     def export_pseudocode(self, binary_name: str, target_func_or_addr: str) -> Optional[str]:
@@ -50,12 +51,15 @@ class GhidraWrapper:
             "-postScript", script_name, target_func_or_addr
         ]
         print(f"[*] 正在从 {target_func_or_addr} 导出伪代码...")
-        # 实际代码中调用 subprocess 抓取标准输出或读取生成的临时文件内容
-        # result = subprocess.run(cmd, capture_output=True, text=True)
-        # return result.stdout
+        result = subprocess.run(cmd, capture_output=True, text=True, errors='ignore')
+        out = result.stdout
         
-        # 这里返回 mock 为演示
-        return f"// Mock pseudo-code for {target_func_or_addr}\nEFI_STATUS {target_func_or_addr}(void *ImageHandle) {{\n    // implementation\n}}"
+        # 解析标准输出获取真正的反编译代码
+        if "---DECOMP_START---" in out and "---DECOMP_END---" in out:
+            return out.split("---DECOMP_START---")[1].split("---DECOMP_END---")[0].strip()
+            
+        print(f"[-] Ghidra 执行可能有误，未找到反编译标记。输出长度: {len(out)}")
+        return None
 
     def locate_linuxloader_handlers(self, binary_name: str, max_count: int = 5) -> list[str]:
         """

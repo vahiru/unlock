@@ -34,7 +34,9 @@ public class ExportDecompile extends ghidra.app.script.GhidraScript {
         DecompileResults res = decomp.decompileFunction(func, 30, TaskMonitor.DUMMY);
         
         if (res.decompileCompleted()) {
+            println("---DECOMP_START---");
             println(res.getDecompiledFunction().getC());
+            println("---DECOMP_END---");
         } else {
             println("Decompilation failed");
         }

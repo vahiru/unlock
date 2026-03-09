@@ -45,7 +45,7 @@ async def main():
     # 1. 自动初始化 Ghidra 项目并导入 body.bin
     print("\n[Phase 1] 初始化 Ghidra 逆向辅助...")
     decompiler = GhidraWrapper(ghidra_home, project_dir, project_name, script_dir)
-    # decompiler.import_binary(binary_path, hex(base_addr)) # 第一次运行时取消注释导入固件
+    decompiler.import_binary(binary_path, hex(base_addr))
     
     # 2. 定位到 LinuxLoader.dll 入口，并导出前 5 个最相关的命令处理函数
     print("\n[Phase 2] 定位核心分发逻辑与导出伪代码...")

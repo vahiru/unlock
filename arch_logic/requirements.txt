@@ -2,3 +2,4 @@ openai>=1.0.0
 angr>=9.2.0
 archinfo>=9.2.0
 python-dotenv>=1.0.0
+unicorn>=2.0.1

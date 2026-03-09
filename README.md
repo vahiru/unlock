@@ -11,11 +11,18 @@ Arch-Logic 是一个针对高通 ABL (Android Bootloader) 固件的自动化漏�
 
 ## 部署步骤 (Deployment Steps)
 
-### 1. 安装 Python 依赖库
-在终端中进入项目根目录：
+### 1. 安装 Python 依赖库 (推荐使用 uv)
+使用 `uv` 可以极大地加速虚拟环境创建和依赖安装。在终端中进入项目根目录：
 ```bash
 cd arch_logic
-pip install -r requirements.txt
+# 创建虚拟环境
+uv venv
+# 激活虚拟环境 (Linux/macOS)
+source .venv/bin/activate
+# 如果是 Windows 用户，请使用: .venv\Scripts\activate
+
+# 安装依赖
+uv pip install -r requirements.txt
 ```
 
 ### 2. 配置环境变量 (.env)

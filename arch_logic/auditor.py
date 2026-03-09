@@ -8,8 +8,15 @@ class Auditor:
     """
     def __init__(self, api_key: str = None, model: str = "gpt-4o"):
         self.api_key = api_key or os.environ.get("OPENAI_API_KEY")
+        self.base_url = os.environ.get("OPENAI_BASE_URL")
         self.model = model
-        self.client = OpenAI(api_key=self.api_key)
+        
+        # 支持由于使用第三方兼容 API 而引发的 base_url 修改
+        client_kwargs = {"api_key": self.api_key}
+        if self.base_url:
+            client_kwargs["base_url"] = self.base_url
+            
+        self.client = OpenAI(**client_kwargs)
 
     def build_cot_prompt(self, pseudocode: str) -> str:
         """

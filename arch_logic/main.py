@@ -1,17 +1,24 @@
 import os
 import asyncio
 from typing import List
+from dotenv import load_dotenv
 
 from ingestor import Ingestor
 from decompiler import GhidraWrapper
 from auditor import Auditor
 from verifier import Verifier
 
+# 加载 .env 环境变量
+load_dotenv()
+
 def ask_llm(pseudocode: str) -> str:
     """
     独立封装的快捷分析函数：将伪代码发给 AI 并返回漏洞分析报告。
     """
-    auditor = Auditor(api_key="mock")  # 替换为真实的 os.getenv("OPENAI_API_KEY")
+    # 优先使用环境变量中的 API Key，如果没配则降级为 mock 用于演示
+    api_key = os.getenv("OPENAI_API_KEY", "mock")
+    model = os.getenv("MODEL_NAME", "gpt-4o")
+    auditor = Auditor(api_key=api_key, model=model)
     return auditor.analyze(pseudocode)
 
 async def main():
@@ -20,13 +27,13 @@ async def main():
     print("="*50)
     
     # --- 环境变量配置 ---
-    binary_path = "body.bin"        # 目标 ABL 固件
-    binary_name = "body.bin"
-    base_addr = 0x9FA00000          # SD865 ABL 默认基址
-    ghidra_home = "C:/ghidra"       # 修改为实际的 Ghidra 安装路径
-    project_dir = "./ghidra_proj"   # Ghidra 项目路径
-    project_name = "abl_analysis"   # Ghidra 项目名
-    script_dir = "./ghidra_scripts" # 自定义脚本路径
+    binary_path = os.getenv("BINARY_PATH", "body.bin")
+    binary_name = os.path.basename(binary_path)
+    base_addr = int(os.getenv("BASE_ADDR", "0x9FA00000"), 16)
+    ghidra_home = os.getenv("GHIDRA_HOME", "/opt/ghidra")
+    project_dir = os.getenv("PROJECT_DIR", "./ghidra_proj")
+    project_name = os.getenv("PROJECT_NAME", "abl_analysis")
+    script_dir = os.getenv("SCRIPT_DIR", "./ghidra_scripts")
     
     # 0. 感知提取 (Ingestion)
     print("\n[Phase 0] 感知二进制提取特征...")

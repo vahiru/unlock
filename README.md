@@ -4,46 +4,48 @@ Arch-Logic 是一个针对高通 ABL (Android Bootloader) 固件的自动化漏�
 
 ## 部署先决条件 (Prerequisites)
 
-1. **Python 3.10+**
-2. **Java JDK 17+** (Ghidra 运行强依赖)
-3. **Ghidra**: 建议下载 [Ghidra 11.x+](https://github.com/NationalSecurityAgency/ghidra/releases) 
+1. **Linux (Ubuntu/Debian 推荐) 或 macOS/Windows**
+2. **Python 3.10+** (建议在 Linux 下使用 `python3-venv` 或 `conda`)
+3. **Java JDK 17+** (Ghidra 运行强依赖，如 `sudo apt install openjdk-17-jdk`)
+4. **Ghidra**: 建议下载 [Ghidra 11.x+](https://github.com/NationalSecurityAgency/ghidra/releases) 
 
 ## 部署步骤 (Deployment Steps)
 
 ### 1. 安装 Python 依赖库
 在终端中进入项目根目录：
-```cmd
+```bash
 cd arch_logic
 pip install -r requirements.txt
 ```
 
-### 2. 配置 Ghidra
-1. 将下载的 Ghidra 解压至电脑的任意目录（例如 `C:\ghidra`）。
-2. 确保系统环境变量中配置好了 JDK 的 `JAVA_HOME`。
-3. 打开 `main.py`，并将 `ghidra_home` 变量修改为你的实际 Ghidra 安装路径：
-```python
-# main.py
-ghidra_home = "C:/ghidra" # 修改为你真实的 Ghidra 路径
-```
+### 2. 配置环境变量 (.env)
+为了方便跨平台部署和配置第三方 API 服务，Agent 引入了 `.env` 支持。
+1. 复制配置示例文件：
+   ```bash
+   cp .env.example .env
+   ```
+2. 编辑 `.env` 文件，填入你的专属配置：
+   ```dotenv
+   OPENAI_API_KEY=sk-xxxx...
+   # 如果你使用第三方代理或兼容节点（如 Claude 转发、DeepSeek 等），请取消下方注释并修改
+   OPENAI_BASE_URL=https://api.your-provider.com/v1
+   MODEL_NAME=gpt-4o
+   
+   # 修改为实际的 Ghidra 解压路径 (Linux 下常见如 /opt/ghidra_11.x)
+   GHIDRA_HOME=/opt/ghidra
+   ```
 
-### 3. 配置 OpenAI API Key
-为 AI 审计模块配置环境变量：
-- **Windows (CMD):**
-  ```cmd
-  set OPENAI_API_KEY=sk-xxxx...
-  ```
-- **Windows (PowerShell):**
-  ```powershell
-  $env:OPENAI_API_KEY="sk-xxxx..."
-  ```
-> **注**: 如果你使用其他提供商（如代理转发或本地模型），可以在 `auditor.py` 中修改 `OpenAI(base_url="...", api_key="...")` 的初始化。
+### 3. 配置 Ghidra
+确保你在 `.env` 中正确填写了 `GHIDRA_HOME`。对于 Linux 用户：
+1. 下载 Ghidra 的 zip 压缩包并解压：`sudo unzip ghidra_11.x...zip -d /opt/`
+2. 重命名方便管理：`sudo mv /opt/ghidra_11.x_PUBLIC /opt/ghidra`
 
 ### 4. 准备目标固件
-将你要分析的固件 `body.bin` (SD865 ABL 镜像) 放置到 `arch_logic/` 同级目录下。
+将你要分析的固件 `body.bin` (SD865 ABL 镜像) 放置到与代码统计的目录下。如名称不同，请在 `.env` 中修改 `BINARY_PATH` 变量。
 
 ### 5. 运行 Agent
-首次运行时，需要取消 `main.py` 中 `decompiler.import_binary` 的注释以完成 Ghidra 初始化。
+首次运行时，需要取消 `main.py` 中 `decompiler.import_binary(...)` 的注释以完成 Ghidra 初始化。
 
-```cmd
+```bash
 python main.py
 ```

@@ -28,7 +28,7 @@ class GhidraWrapper:
             "-import", binary_path,
             "-loader", "BinaryLoader",
             "-loader-imagebase", base_addr,
-            "-processor", "AARCH64:LE:8:default", # 高通 SD865 为 ARM64 (Ghidra 12)
+            "-processor", "AARCH64:LE:64:v8A", # 高通 SD865 为 ARM64 (Ghidra 12)
             "-overwrite" 
         ]
         print(f"[*] 执行导入并分析: {' '.join(cmd)}")

